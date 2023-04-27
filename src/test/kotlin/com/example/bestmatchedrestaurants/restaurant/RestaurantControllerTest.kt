@@ -1,33 +1,43 @@
 package com.example.bestmatchedrestaurants.restaurant
 
 import com.example.bestmatchedrestaurants.cuisine.Cuisine
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
-import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.http.MediaType
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
-@SpringBootTest
-class RestaurantControllerTest (
-    @Autowired
-    val restaurantController: RestaurantController)
+@WebMvcTest(RestaurantController::class)
+class RestaurantControllerTest (@Autowired val mockMvc: MockMvc)
 {
-    @MockBean
-    private lateinit var restaurantService: RestaurantService
+    @MockkBean
+    lateinit var restaurantService: RestaurantService
 
     @BeforeEach
     fun setUp() {
         val sampleCuisine = Cuisine(id = 1, name = "sample")
 
-        given(restaurantService.findFiltered(any())).willReturn(List<Restaurant>(5) {
+        every { restaurantService.findFiltered(any()) } returns List<Restaurant>(5) {
             Restaurant(name = it.toString(), customerRating = it, distance = it, price = it, cuisine = sampleCuisine)
-        })
+        }
     }
 
     @Test
     fun findAll() {
-        assert(restaurantController.findFiltered(RestaurantFilter(null, null, null, null, null)).count() == 5)
+        mockMvc.perform(get("/restaurant/filter").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("\$.length()").value(5))
+    }
+
+    @Test
+    fun `fails with invalid data`() {
+        mockMvc.perform(get("/restaurant/filter?distance=a").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
     }
 }

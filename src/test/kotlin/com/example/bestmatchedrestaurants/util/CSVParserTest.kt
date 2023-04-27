@@ -1,29 +1,29 @@
 package com.example.bestmatchedrestaurants.util
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import kotlin.test.assertFailsWith
 
 class CSVParserTest {
-
     @Test
     fun `parse success`() {
         val output = CSVParser("test1,test2\r\n" +
                 "1,2\r\n" +
                 "3,4").parse()
 
-        assert(output.size == 2)
+        assertThat(output.size).isEqualTo(2)
 
-        assert(output[0]["test1"] == "1")
-        assert(output[0]["test2"] == "2")
-        assert(output[1]["test1"] == "3")
-        assert(output[1]["test2"] == "4")
+        assertThat(output[0]["test1"]).isEqualTo("1")
+        assertThat(output[0]["test2"]).isEqualTo("2")
+        assertThat(output[1]["test1"]).isEqualTo("3")
+        assertThat(output[1]["test2"]).isEqualTo("4")
     }
 
     @Test
     fun `parse success empty`() {
         val output = CSVParser("").parse()
 
-        assert(output.size == 0)
+        assertThat(output.size).isEqualTo(0)
     }
 
     @Test

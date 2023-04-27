@@ -1,6 +1,7 @@
 package com.example.bestmatchedrestaurants.restaurant
 
 import com.example.bestmatchedrestaurants.cuisine.Cuisine
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,10 +19,10 @@ class RestaurantRepositoryTest @Autowired constructor(
 
     @BeforeEach
     fun setUp() {
-        entityManager.clear();
+        entityManager.clear()
 
-        entityManager.persist(chineseCuisine);
-        entityManager.persist(mexicanCuisine);
+        entityManager.persist(chineseCuisine)
+        entityManager.persist(mexicanCuisine)
 
         entityManager.flush()
 
@@ -44,160 +45,7 @@ class RestaurantRepositoryTest @Autowired constructor(
 
     @Test
     fun `findFiltered get at most 5`() {
-        assert(
-            restaurantRepository.findFiltered(
-                RestaurantFilter(
-                    name = null,
-                    customerRating = null,
-                    price = null,
-                    distance = null,
-                    cuisine = null
-                )
-            ).count() == 5
-        )
-    }
-
-    @Test
-    fun `findFiltered name`() {
-        assert(
-            restaurantRepository.findFiltered(
-                RestaurantFilter(
-                    name = "Mexican",
-                    customerRating = null,
-                    price = null,
-                    distance = null,
-                    cuisine = "Mexi"
-                )
-            ).count() == 5
-        )
-    }
-
-    @Test
-    fun `findFiltered name case insensitive`() {
-        assert(
-            restaurantRepository.findFiltered(
-                RestaurantFilter(
-                    name = "Mexican",
-                    customerRating = null,
-                    price = null,
-                    distance = null,
-                    cuisine = "mexi"
-                )
-            ).count() == 5
-        )
-    }
-
-    @Test
-    fun `findFiltered customerRating`() {
-        assert(
-            restaurantRepository.findFiltered(
-                RestaurantFilter(
-                    name = null,
-                    customerRating = 3,
-                    price = null,
-                    distance = null,
-                    cuisine = null
-                )
-            ).count() == 4
-        )
-    }
-
-    @Test
-    fun `findFiltered price`() {
-        assert(
-            restaurantRepository.findFiltered(
-                RestaurantFilter(
-                    name = null,
-                    customerRating = null,
-                    price = 1,
-                    distance = null,
-                    cuisine = null
-                )
-            ).count() == 4
-        )
-    }
-
-    @Test
-    fun `findFiltered distance`() {
-        assert(
-            restaurantRepository.findFiltered(
-                RestaurantFilter(
-                    name = null,
-                    customerRating = null,
-                    price = null,
-                    distance = 1,
-                    cuisine = null
-                )
-            ).count() == 4
-        )
-    }
-
-    @Test
-    fun `findFiltered cuisine`() {
-        assert(
-            restaurantRepository.findFiltered(
-                RestaurantFilter(
-                    name = null,
-                    customerRating = null,
-                    price = null,
-                    distance = null,
-                    cuisine = "Mex"
-                )
-            ).count() == 5
-        )
-    }
-
-    @Test
-    fun `findFiltered cuisine case insensitive`() {
-        assert(
-            restaurantRepository.findFiltered(
-                RestaurantFilter(
-                    name = null,
-                    customerRating = null,
-                    price = null,
-                    distance = null,
-                    cuisine = "mex"
-                )
-            ).count() == 5
-        )
-    }
-
-    @Test
-    fun `findFiltered name & cuisine`() {
-        assert(
-            RestaurantService(restaurantRepository).findFiltered(
-                RestaurantFilter(
-                    name = "2",
-                    customerRating = null,
-                    price = null,
-                    distance = null,
-                    cuisine = "Mex"
-                )
-            ).count() == 1
-        )
-    }
-
-    @Test
-    fun `findFiltered filter & sort distance`() {
-        val filteredResults = restaurantRepository.findFiltered(
-            RestaurantFilter(
-                name = "Mexican",
-                customerRating = null,
-                price = null,
-                distance = null,
-                cuisine = null
-            )
-        )
-
-        assert(filteredResults[0].distance == 0)
-        assert(filteredResults[1].distance == 1)
-        assert(filteredResults[2].distance == 2)
-        assert(filteredResults[3].distance == 3)
-    }
-
-    @Test
-    fun `findFiltered sort distance`() {
-        val filteredResults = restaurantRepository.findFiltered(
+        val response = restaurantRepository.findFiltered(
             RestaurantFilter(
                 name = null,
                 customerRating = null,
@@ -207,10 +55,163 @@ class RestaurantRepositoryTest @Autowired constructor(
             )
         )
 
-        assert(filteredResults[0].distance == 0)
-        assert(filteredResults[1].distance == 0)
-        assert(filteredResults[2].distance == 1)
-        assert(filteredResults[3].distance == 1)
+        assertThat(response.count()).isEqualTo(5)
+    }
+
+    @Test
+    fun `findFiltered name`() {
+        val response = restaurantRepository.findFiltered(
+            RestaurantFilter(
+                name = "Mex",
+                customerRating = null,
+                price = null,
+                distance = null,
+                cuisine = null
+            )
+        )
+
+        assertThat(response.count()).isEqualTo(5)
+    }
+
+    @Test
+    fun `findFiltered name case insensitive`() {
+        val response = restaurantRepository.findFiltered(
+            RestaurantFilter(
+                name = "mex",
+                customerRating = null,
+                price = null,
+                distance = null,
+                cuisine = null
+            )
+        )
+
+        assertThat(response.count()).isEqualTo(5)
+    }
+
+    @Test
+    fun `findFiltered customerRating`() {
+        val response = restaurantRepository.findFiltered(
+            RestaurantFilter(
+                name = null,
+                customerRating = 3,
+                price = null,
+                distance = null,
+                cuisine = null
+            )
+        )
+
+        assertThat(response.count()).isEqualTo(4)
+    }
+
+    @Test
+    fun `findFiltered price`() {
+        val response = restaurantRepository.findFiltered(
+            RestaurantFilter(
+                name = null,
+                customerRating = null,
+                price = 1,
+                distance = null,
+                cuisine = null
+            )
+        )
+
+        assertThat(response.count()).isEqualTo(4)
+    }
+
+    @Test
+    fun `findFiltered distance`() {
+        val response = restaurantRepository.findFiltered(
+            RestaurantFilter(
+                name = null,
+                customerRating = null,
+                price = 1,
+                distance = null,
+                cuisine = null
+            )
+        )
+
+        assertThat(response.count()).isEqualTo(4)
+    }
+
+    @Test
+    fun `findFiltered cuisine`() {
+        val response = restaurantRepository.findFiltered(
+            RestaurantFilter(
+                name = null,
+                customerRating = null,
+                price = null,
+                distance = null,
+                cuisine = "Mex"
+            )
+        )
+
+        assertThat(response.count()).isEqualTo(5)
+    }
+
+    @Test
+    fun `findFiltered cuisine case insensitive`() {
+        val response = restaurantRepository.findFiltered(
+            RestaurantFilter(
+                name = null,
+                customerRating = null,
+                price = null,
+                distance = null,
+                cuisine = "mex"
+            )
+        )
+
+        assertThat(response.count()).isEqualTo(5)
+    }
+
+    @Test
+    fun `findFiltered name & cuisine`() {
+        val response = restaurantRepository.findFiltered(
+            RestaurantFilter(
+                name = "2",
+                customerRating = null,
+                price = null,
+                distance = null,
+                cuisine = "mex"
+            )
+        )
+
+        assertThat(response.count()).isEqualTo(1)
+    }
+
+    @Test
+    fun `findFiltered filter & sort distance`() {
+        val response = restaurantRepository.findFiltered(
+            RestaurantFilter(
+                name = "Mex",
+                customerRating = null,
+                price = null,
+                distance = null,
+                cuisine = null
+            )
+        )
+
+        assertThat(response[0].distance).isEqualTo(0)
+        assertThat(response[1].distance).isEqualTo(1)
+        assertThat(response[2].distance).isEqualTo(2)
+        assertThat(response[3].distance).isEqualTo(3)
+    }
+
+    @Test
+    fun `findFiltered sort distance`() {
+        val response = restaurantRepository.findFiltered(
+            RestaurantFilter(
+                name = null,
+                customerRating = null,
+                price = null,
+                distance = null,
+                cuisine = null
+            )
+        )
+
+        assertThat(response[0].distance).isEqualTo(0)
+        assertThat(response[1].distance).isEqualTo(0)
+        assertThat(response[2].distance).isEqualTo(1)
+        assertThat(response[3].distance).isEqualTo(1)
     }
 
     @Test
@@ -219,7 +220,7 @@ class RestaurantRepositoryTest @Autowired constructor(
 
         entityManager.persist(newRestaurant)
 
-        val filteredResults = restaurantRepository.findFiltered(
+        val response = restaurantRepository.findFiltered(
             RestaurantFilter(
                 name = null,
                 customerRating = null,
@@ -229,7 +230,7 @@ class RestaurantRepositoryTest @Autowired constructor(
             )
         )
 
-        assert(filteredResults[0].name == "newRestaurant")
+        assertThat(response[0].name).isEqualTo(newRestaurant.name)
     }
 
     @Test
@@ -240,7 +241,7 @@ class RestaurantRepositoryTest @Autowired constructor(
         entityManager.persist(newRestaurant1)
         entityManager.persist(newRestaurant2)
 
-        val filteredResults = restaurantRepository.findFiltered(
+        val response = restaurantRepository.findFiltered(
             RestaurantFilter(
                 name = null,
                 customerRating = null,
@@ -250,6 +251,6 @@ class RestaurantRepositoryTest @Autowired constructor(
             )
         )
 
-        assert(filteredResults[0].name == "newRestaurant1")
+        assertThat(response[0].name).isEqualTo(newRestaurant1.name)
     }
 }

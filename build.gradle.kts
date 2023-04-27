@@ -34,9 +34,13 @@ dependencies {
 
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.springframework.boot:spring-boot-starter-test") {
+		exclude(module = "mockito-core")
+	}
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.8.0")
-	testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
+	testImplementation("org.junit.jupiter:junit-jupiter-api")
+	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+	testImplementation("com.ninja-squad:springmockk:4.0.0")
 }
 
 allOpen {

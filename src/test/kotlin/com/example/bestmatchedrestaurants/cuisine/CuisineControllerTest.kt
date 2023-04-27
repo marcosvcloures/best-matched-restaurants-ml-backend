@@ -1,29 +1,36 @@
 package com.example.bestmatchedrestaurants.cuisine
 
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.http.MediaType
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
-@SpringBootTest
-class CuisineControllerTest (
-    @Autowired
-    val cuisineController: CuisineController)
+@WebMvcTest(CuisineController::class)
+class CuisineControllerTest (@Autowired val mockMvc: MockMvc)
 {
-    @MockBean
+    @MockkBean
     private lateinit var cuisineService : CuisineService
 
     @BeforeEach
     fun setUp() {
-        given(cuisineService.findAll()).willReturn(List<Cuisine>(2) {
+        every { cuisineService.findAll() } returns List<Cuisine>(2) {
             Cuisine(id = it, name = it.toString())
-        })
+        }
     }
 
     @Test
     fun findAll() {
-        assert(cuisineController.findAll().count() == 2)
+        mockMvc.perform(MockMvcRequestBuilders.get("/cuisine/").accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("\$.length()").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("\$.[0].name").value("0"))
+                .andExpect(MockMvcResultMatchers.jsonPath("\$.[1].name").value("1"))
     }
 }
