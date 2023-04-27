@@ -1,5 +1,6 @@
 package com.example.bestmatchedrestaurants.cuisine
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -30,16 +31,20 @@ class CuisineRepositoryTest @Autowired constructor(
 
     @Test
     fun findAll() {
-        assert(cuisineRepository.findAll().count() == 2)
+        assertThat(cuisineRepository.findAll().count()).isEqualTo(2)
     }
 
     @Test
     fun `findAll and has Chinese`() {
-        assert(cuisineRepository.findAll().toList().stream().anyMatch { cuisine -> cuisine.id == 1 && cuisine.name == "Chinese" })
+        val existsChinese = cuisineRepository.findAll().toList().stream().anyMatch { cuisine -> cuisine.id == 1 && cuisine.name == "Chinese" }
+
+        assertThat(existsChinese).isEqualTo(true)
     }
 
     @Test
     fun `findAll and has Mexican`() {
-        assert(cuisineRepository.findAll().toList().stream().anyMatch { cuisine -> cuisine.id == 2 && cuisine.name == "Mexican" })
+        val existsMexican = cuisineRepository.findAll().toList().stream().anyMatch { cuisine -> cuisine.id == 2 && cuisine.name == "Mexican" }
+
+        assertThat(existsMexican).isEqualTo(true)
     }
 }
