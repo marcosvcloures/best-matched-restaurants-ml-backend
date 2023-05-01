@@ -10,23 +10,20 @@ class CSVParser(private val csvText: String)
         csvText.split("\r\n").forEach {
             val values = it.split(',');
 
-            // it's the first line
-            if (keys == null)
-            {
-                keys = values;
-            }
-            else
-            {
+            keys ?. let { keys ->
                 val line = HashMap<String, String>();
 
-                if (values.size != keys!!.size)
+                if (values.size != keys.size)
                     throw IllegalArgumentException(String.format("Line size mismatched with header size, line size: %d, header size: %d, line:\n\t%s", values.size, keys!!.size, line))
 
                 for (index in values.indices)
-                    line[keys!![index]] = values[index];
+                    line[keys[index]] = values[index];
 
                 response.add(line);
             }
+
+            // it's the first line
+            keys = keys ?: values;
         }
 
         return response;
